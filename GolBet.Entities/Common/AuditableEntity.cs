@@ -1,4 +1,5 @@
-﻿namespace GolBet.Entities.Common;
+namespace GolBet.Entities.Common;
+
 /// <summary>
 /// Base class for all domain entities.
 /// Provides identity, audit timestamps and logical activation state.

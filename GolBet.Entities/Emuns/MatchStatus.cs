@@ -1,5 +1,4 @@
-﻿// GolBet.Entities/Enums/MatchStatus.cs
-namespace GolBet.Entities.Enums;
+﻿namespace GolBet.Entities.Enums;
 
 public enum MatchStatus
 {
