@@ -32,4 +32,22 @@ public class MatchRepository : GenericRepository<Match>, IMatchRepository
             .Include(m => m.Bets)
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == id);
+
+    public async Task<IEnumerable<Match>> GetAllWithTeamsAsync(MatchStatus? status = null, string? search = null)
+    {
+        var query = _dbSet
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .Where(m => m.IsActive)
+            .AsNoTracking();
+
+        if (status.HasValue)
+            query = query.Where(m => m.Status == status.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(m => m.HomeTeam.Name.Contains(search)
+                                  || m.AwayTeam.Name.Contains(search));
+
+        return await query.OrderBy(m => m.Date).ToListAsync();
+    }
 }
