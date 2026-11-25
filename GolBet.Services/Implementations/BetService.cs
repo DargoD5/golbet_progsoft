@@ -3,8 +3,10 @@ using GolBet.Entities;
 using GolBet.Entities.Enums;
 using GolBet.Repositories.Interfaces;
 using GolBet.Services.DTOs;
+using GolBet.Services.Implementations;
 using GolBet.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace GolBet.Services.Implementations;
 
@@ -14,17 +16,21 @@ public class BetService : IBetService
     private readonly IMatchRepository _matchRepository;
     private readonly UserManager<AppUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly ILogger<BetService> _logger;   // nuevo campo
+
 
     public BetService(
         IBetRepository betRepository,
         IMatchRepository matchRepository,
         UserManager<AppUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        ILogger<BetService> logger)
     {
         _betRepository = betRepository;
         _matchRepository = matchRepository;
         _userManager = userManager;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task PlaceBetAsync(string userId, BetFormDto dto)
@@ -75,7 +81,12 @@ public class BetService : IBetService
             Status = BetStatus.Pending
         };
 
-        await _betRepository.AddAsync(bet);   // SaveChangesAsync happens here
+        await _betRepository.AddAsync(bet);
+        _logger.LogInformation(
+        "Bet placed: user {UserId} bet {Amount} on {Pick} " +
+        "for match {MatchId} at odds {Odds}",
+        userId, dto.Amount, dto.Pick, dto.MatchId, oddsAtPlacement);
+        // SaveChangesAsync happens here
     }
 
     public async Task<IEnumerable<BetDto>> GetMyBetsAsync(string userId)
